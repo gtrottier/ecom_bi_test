@@ -18,7 +18,7 @@ class AnalysisResponse(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict, description="Metadata")
 
 class AgentState(TypedDict):
-    messages: Annotated[list, add_messages]
+    messages: Annotated[list[Any], add_messages]
     product_name: str
     competitors: list[str]
     # Idées, à traiter dans outils peut-être

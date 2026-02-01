@@ -41,8 +41,8 @@ def should_continue(state: AgentState) -> Literal["tools", "__end__"]:
         return "tools"
     return "__end__"
     
-
-workflow = StateGraph(AgentState)
+#Note : typechecker 'ty' renvoi erreur, mais fonctionne correctement. À suivre
+workflow = StateGraph(AgentState) # ty: ignore[invalid-argument-type]
 
 workflow.add_node("agent", call_model)
 workflow.add_node("tools", tool_node)
