@@ -15,9 +15,12 @@ Pour un setup de développement, uv/poetry.
 - uv package manager (préférablement, sinon pip ou poetry peuvent fonctionner)
 - python >= 3.12
 
+- Clé API OpenRouter. 
+    **Note**: Clé API non-fournie car repo publique. Seulement ajouter la variable d'env OPENROUTER_API_KEY.
+
 **Note**: Non-requis mais on suppose un shell POSIX (bash, zsh, etc) et les permissions nécessaires. Commandes roulées à partir de la racine du dépôt.
 
-### Installation
+### Installation et utilisation
 
 1. Cloner le dépôt
 
@@ -26,7 +29,18 @@ Pour un setup de développement, uv/poetry.
     - (pip) `python -m venv .venv && source .venv/bin/activate && pip install .`
     - (poetry) `poetry install`
 
-***RESTE A VENIR***
+3. Lancer l'API:
+    - Option 1: Docker
+        - `docker-compose up -d`
+    - Option 2: Local
+        - `uv run uvicorn app.main:app --reload --port 8000`
+
+4. Voir api docs:
+    - `http://localhost:8000/docs`
+    # note : Vous pouvez lancer des requêtes de test directement depuis l'interface swagger, ou avec curl/postman etc.
+
+***Exemples de contenu de requêtes:***
+Fonctionnelle : `product_name="HyperWidget X", brand="FutureCorp", competitors=["OldWidget Y"]`
 
 
 
