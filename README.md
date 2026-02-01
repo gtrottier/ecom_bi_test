@@ -116,7 +116,7 @@ On peut encore utiliser le LLM-as-judge pour évaluer en aggrégat et vraiment c
 ### Implémenter feedback loop utilisateur
 À même l'application, on pourrait mettre en place un système de feedback utilisateur, par exemple avec des pouces haut/bas, pour collecter des données sur la qualité (ou perception de qualité) des réponses. Ce feedback serait associé à la trace correspondante et pourrait être sauvegardé dans une base de données.
 
-### Faier évoluer la capacité des agents
+### Faire évoluer la capacité des agents
 Comme les agents et les outils sont encapsulé et modulaires, il serait assez simple de les faire évoluer.
 Lorsqu'un nouveau besoin est identifié, pourrait créer un tout nouvel agent ou de nouveaux outils ou simplement améliorer ce qui existe déjà.
 
