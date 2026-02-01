@@ -25,3 +25,16 @@ class AgentState(TypedDict):
     collected_data: dict[str, Any]
     insights: Annotated[list[str], operator.add]
     recommendations: Annotated[list[str], operator.add]
+
+# Utile pour éviter de propager des erreurs, machine-readable
+class ToolSuccess(TypedDict):
+    status: Literal["ok"]
+    data: dict[str, Any]
+
+class ToolError(TypedDict):
+    status: Literal["error"]
+    error_type: str
+    message: str
+    retryable: bool
+
+ToolResult = ToolSuccess | ToolError

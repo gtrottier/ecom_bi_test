@@ -1,19 +1,23 @@
-from typing import Any
 from langchain_core.tools import tool
 
+from app.schema import ToolResult
+
+
 @tool
-def scrape_product_data(product_name: str, brand: str, competitors: list[str]) -> dict[str, Any]:
+def scrape_product_data(
+    product_name: str, brand: str, competitors: list[str]
+) -> ToolResult:
     """
     Scrape les données du produit
     Pour l'instant, réutilise directement les données fournies
     """
-    #TODO : Logique
+    # TODO : Logique
     try:
         data = {
             "product_name": product_name,
             "brand": brand,
             "competitors": competitors,
-            "data": {}
+            "data": {},
         }
     except Exception as e:
         return {
