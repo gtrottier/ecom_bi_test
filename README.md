@@ -34,6 +34,11 @@ Pour un setup de développement, uv/poetry.
 **Note**: Pour limiter le nombre de technologies ou services différents, je vais préférer des solutions qui offrent plusieurs outils ou ont plusieurs intégrations supportées officiellement, comme LangFuse qui est d'ailleurs Open Source et peut être auto-hébergé.
 
 ## 4 Architecture de données et stockage
+# TODO
+Détails sur schemas de données
+
+
+
 ### Stockage résultats d'analyse:
 PostgreSQL semble un bon choix. Assez standard, peut être auto-hébergé (docker) ou via différentes solutions cloud gérées selon équipe, expertise, budget etc.
 Désultats stockés en JSONB pour flexibilité.
