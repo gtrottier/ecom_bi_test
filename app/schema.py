@@ -18,10 +18,23 @@ class AnalysisResponse(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict, description="Metadata")
 
 class AgentState(TypedDict):
-    messages: Annotated[list, add_messages]
+    messages: Annotated[list[Any], add_messages]
     product_name: str
     competitors: list[str]
     # Idées, à traiter dans outils peut-être
     collected_data: dict[str, Any]
     insights: Annotated[list[str], operator.add]
     recommendations: Annotated[list[str], operator.add]
+
+# Utile pour éviter de propager des erreurs, machine-readable
+class ToolSuccess(TypedDict):
+    status: Literal["ok"]
+    data: dict[str, Any]
+
+class ToolError(TypedDict):
+    status: Literal["error"]
+    error_type: str
+    message: str
+    retryable: bool
+
+ToolResult = ToolSuccess | ToolError
