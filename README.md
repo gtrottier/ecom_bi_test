@@ -40,8 +40,26 @@ Pour un setup de développement, uv/poetry.
     # note : Vous pouvez lancer des requêtes de test directement depuis l'interface swagger, ou avec curl/postman etc.
 
 ***Exemples de contenu de requêtes:***
-Fonctionnelle : `product_name="HyperWidget X", brand="FutureCorp", competitors=["OldWidget Y"]`
+```
+curl -X POST http://localhost:8000/analyze \
+     -H "Content-Type: application/json" \
+     -d '{
+       "product_name": "Airmax 2025",
+       "brand": "Nike",
+       "competitors": ["Adidas Ultraboost", "Puma RS-X"]
+     }'
+```
 
+Ex requête non-fonctionnelle
+```
+curl -X POST http://localhost:8000/analyze \
+     -H "Content-Type: application/json" \
+     -d '{
+       "product_name": ",
+       "brand": "inconnue",
+       "competitors": ["Adidas Ultraboost"]
+     }'
+```
 
 
 # Théorie, améliorations possibles etc.
