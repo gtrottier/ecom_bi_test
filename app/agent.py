@@ -1,0 +1,60 @@
+import os
+from typing import Literal
+
+from dotenv import load_dotenv
+from langchain_core.messages import AIMessage, SystemMessage
+from langchain_openai import ChatOpenAI
+from langgraph.graph import START, StateGraph
+from langgraph.prebuilt import ToolNode
+
+from app.prompts import SYSTEM_PROMPT_FR
+from app.schema import AgentState
+from app.tools.reporter import generate_report
+from app.tools.scraper import scrape_product_data
+from app.tools.sentiment import analyze_sentiment
+
+load_dotenv()
+
+tools = [scrape_product_data, analyze_sentiment, generate_report]
+tool_node = ToolNode(tools)
+
+llm = ChatOpenAI(
+    base_url=os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
+    api_key=os.getenv("OPENROUTER_API_KEY", ""),
+    model="google/gemini-2.5-flash",
+    temperature=0,
+)
+
+llm_with_tools = llm.bind_tools(tools)
+
+
+def call_model(state: AgentState):
+    """Invoke le llm avec 'state' actuel"""
+    messages = state["messages"]
+    # Ajout du system prompt si nécessaire
+    if not isinstance(messages[0], SystemMessage):
+        messages = [SystemMessage(content=SYSTEM_PROMPT_FR)] + messages
+
+    response = llm_with_tools.invoke(messages)
+    return {"messages": [response]}
+
+
+def should_continue(state: AgentState) -> Literal["tools", "__end__"]:
+    """Détermine si le processus doit continuer basé sur le dernier message"""
+    messages = state["messages"]
+    last_message = messages[-1]
+
+    if isinstance(last_message, AIMessage) and last_message.tool_calls:
+        return "tools"
+    return "__end__"
+
+
+workflow = StateGraph(AgentState)
+workflow.add_node("agent", call_model)
+workflow.add_node("tools", tool_node)
+
+workflow.add_edge(START, "agent")
+workflow.add_conditional_edges("agent", should_continue)
+workflow.add_edge("tools", "agent")
+
+graph_app = workflow.compile()
