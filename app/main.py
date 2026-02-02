@@ -21,9 +21,10 @@ async def analyze_product(request: AnalysisRequest):
     """
     try:
         initial_state = {
+            # NOTE: Dans un système réel, on pourrait avoir un champ pour la langue
             "messages": [
                 HumanMessage(
-                    content=f"Analyze the product '{request.product_name}' by brand '{request.brand}'. Competitors: {', '.join(request.competitors) if request.competitors else 'None'}."
+                    content=f"Analysez ce produit '{request.product_name}' de la marque '{request.brand}'. Concurrents: {', '.join(request.competitors) if request.competitors else 'None'}."
                 )
             ],
             "product_name": request.product_name,
