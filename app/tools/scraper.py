@@ -15,9 +15,18 @@ def scrape_product_data(product_name: str, brand: str) -> ToolResult:
 
     platforms = ["amazon", "bestbuy", "ebay", "walmart"]
     data = []
-    market_price = random.randint(100, 350)
     try:
+        market_price = random.randint(100, 350)
         for platform in platforms:
+            # Nettoyage de base des url
+            safe_product = (
+                product_name.lower()
+                .replace(" ", "-")
+                .replace("&", "and")
+                .replace("/", "-")
+            )
+            safe_brand = brand.lower().replace(" ", "-")
+
             data.append(
                 {
                     "platform": platform,
@@ -25,7 +34,7 @@ def scrape_product_data(product_name: str, brand: str) -> ToolResult:
                     "availability": random.choice(
                         ["In Stock", "Low Stock", "Out of Stock"]
                     ),
-                    "url": f"https://www.{platform.lower()}.com/{brand}/{product_name.replace(' ', '-').lower()}",
+                    "url": f"https://www.{platform.lower()}.com/{safe_brand}/{safe_product}",
                 }
             )
 
