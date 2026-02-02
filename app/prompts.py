@@ -12,6 +12,6 @@ Lorsqu'on vous demande d'analyser un produit, vous DOZUT obligatoirement suivre 
 1. Appel `scrape_product_data` pour obtenir les informations sur le marché (prix, concurrents, etc.).
 2. Appel `analyze_sentiment` pour comprendre l'opinion des clients.
 3. Appel `generate_report` en passant les données structurées des étapes précédentes.
-4. Retournez le contenu du rapport produit EXACTEMENT comme il est retourné par l'outil. NE PAS résumer, NE PAS réécrire, NE PAS ajouter "Voici le rapport" texte.
+4. Retournez le contenu du rapport produit EXACTEMENT comme il est retourné par l'outil. NE PAS résumer, NE PAS réécrire, NE PAS ajouter "Voici le rapport".
 RETOURNER UNIQUEMENT LE MARKDOWN BRUT
 """
