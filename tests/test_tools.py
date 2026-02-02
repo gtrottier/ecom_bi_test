@@ -1,5 +1,10 @@
 from unittest.mock import patch
 
+from langchain_core.messages import HumanMessage
+import pytest
+
+from app.agent import graph_app
+from app.schema import AnalysisRequest
 from app.tools.scraper import scrape_product_data
 from app.tools.sentiment import analyze_sentiment
 from app.tools.trends import analyze_trends
@@ -91,3 +96,61 @@ def test_sentiment_error_handling():
         result = analyze_sentiment.invoke({"product_name": "NoModel"})
         assert result["status"] == "error"
         assert "Model Load Error" in result["message"]
+
+
+@pytest.mark.anyio
+async def test_agent_flow():
+    """
+    Test simple de l'agent
+    On réutilise essentiellement le code de main.py
+    (Devrait être fonctions modulaires)
+    """
+
+    print("Lancement du test de l'agent")
+
+    request = AnalysisRequest(
+        product_name="Airmax 2026", brand="Nike", competitors=["Adidas Ultraboost"]
+    )
+
+    initial_state = {
+        "messages": [
+            HumanMessage(
+                content=f"Analysez ce produit '{request.product_name}' de la marque '{request.brand}'. Concurrents: {', '.join(request.competitors)}."
+            )
+        ],
+        "product_name": request.product_name,
+        "competitors": request.competitors,
+        "collected_data": {},
+    }
+
+    try:
+        result = await graph_app.ainvoke(initial_state)
+        messages = result["messages"]
+        last_message = messages[-1]
+
+        print("\nRésultat final")
+        print(f"Nombre de messages: {len(messages)}")
+        print(f"Contenu final:\n{last_message.content[:200]}...")
+
+        # Validation
+        print("\nTrace des outils")
+        for message in messages:
+            if hasattr(message, "tool_calls") and message.tool_calls:
+                for tool_call in message.tool_calls:
+                    print(f"Outil: {tool_call['name']}")
+            if hasattr(message, "name") and message.name == "generate_report":
+                print("Message de sortie generate_report trouvé.")
+
+        has_tool_calls = any(
+            hasattr(message, "tool_calls") and message.tool_calls
+            for message in messages
+        )
+        print(f"\nA des appels d'outils: {has_tool_calls}")
+
+        if "Prix" in last_message.content and "Score" in last_message.content:
+            print("SUCCESS: Le format du rapport est détecté.")
+        else:
+            print("WARNING: Le format du rapport n'est pas détecté.")
+
+    except Exception as e:
+        print(f"ERROR: {e}")

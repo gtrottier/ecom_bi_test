@@ -19,6 +19,8 @@ async def analyze_product(request: AnalysisRequest):
     """
     Lance l'analyse d'un produit à partir des données fournies et retourne un rapport.
     """
+
+    # TODO: Config + fonctions réutilisables
     try:
         initial_state = {
             # NOTE: Dans un système réel, on pourrait avoir un champ pour la langue
