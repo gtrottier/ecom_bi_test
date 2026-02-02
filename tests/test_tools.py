@@ -105,9 +105,6 @@ async def test_agent_flow():
     On réutilise essentiellement le code de main.py
     (Devrait être fonctions modulaires)
     """
-
-    print("Lancement du test de l'agent")
-
     request = AnalysisRequest(
         product_name="Airmax 2026", brand="Nike", competitors=["Adidas Ultraboost"]
     )
@@ -123,34 +120,29 @@ async def test_agent_flow():
         "collected_data": {},
     }
 
-    try:
-        result = await graph_app.ainvoke(initial_state)
-        messages = result["messages"]
-        last_message = messages[-1]
+    result = await graph_app.ainvoke(initial_state)
+    messages = result["messages"]
+    last_message = messages[-1]
 
-        print("\nRésultat final")
-        print(f"Nombre de messages: {len(messages)}")
-        print(f"Contenu final:\n{last_message.content[:200]}...")
+    # Vérifie que des messages ont été générés
+    # Vérifie la présence des appels d'outils critiques
+    assert len(messages) > 1
+    tool_names = []
+    for m in messages:
+        if hasattr(m, "tool_calls") and m.tool_calls:
+            for tc in m.tool_calls:
+                tool_names.append(tc["name"])
 
-        # Validation
-        print("\nTrace des outils")
-        for message in messages:
-            if hasattr(message, "tool_calls") and message.tool_calls:
-                for tool_call in message.tool_calls:
-                    print(f"Outil: {tool_call['name']}")
-            if hasattr(message, "name") and message.name == "generate_report":
-                print("Message de sortie generate_report trouvé.")
+    assert "scrape_product_data" in tool_names
+    assert "analyze_sentiment" in tool_names
+    assert "generate_report" in tool_names
 
-        has_tool_calls = any(
-            hasattr(message, "tool_calls") and message.tool_calls
-            for message in messages
-        )
-        print(f"\nA des appels d'outils: {has_tool_calls}")
+    # Vérifie que le rapport final contient les informations clés
+    content = last_message.content
+    assert "Prix" in content or "Tableau" in content or "Plateforme" in content
+    assert "Score" in content or "Sentiment" in content
+    assert request.brand.lower() in content.lower()
+    assert request.product_name.lower() in content.lower()
 
-        if "Prix" in last_message.content and "Score" in last_message.content:
-            print("SUCCESS: Le format du rapport est détecté.")
-        else:
-            print("WARNING: Le format du rapport n'est pas détecté.")
-
-    except Exception as e:
-        print(f"ERROR: {e}")
+    # Vérifie qu'il n'y a pas d'erreur rapportée dans le contenu final
+    assert "ERROR" not in content.upper()
