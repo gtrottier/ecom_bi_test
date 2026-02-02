@@ -4,8 +4,13 @@
 
 Simple système agentique d'analyse de données e-commerce. Utilise plusieurs outils (mock) pour scraper des données, analyser les tendances et les sentiments, et générer des rapports.
 
+Le système est basé sur le framework LangGraph, très populaire, bien documenté et facile à utiliser.
+De plus, les graphes sont très flexibles et peuvent être modifiés facilement.
+
+L'interface API REST est faite avec FastAPI. Cette librairie est pratique pour sa performance, son support natif des appels asynchrone (ASGI, vs Flask par exemple qui est WSGI), validation robuste des données avec Pydantic, et permet de tester des requêtes directement depuis l'interface swagger
+
 Pour simplifier le déploiement et l'essai, Docker est utilisé.
-Pour le développement, on préferera uv/poetry. 
+Pour le développement, on préferera uv (ou poetry). 
 ## Installation
 
 ### Prérequis
@@ -75,24 +80,63 @@ curl -X POST http://localhost:8000/analyze \
 **Note**: Pour limiter le nombre de technologies ou services différents, je vais préférer des solutions qui offrent plusieurs outils ou ont plusieurs intégrations supportées officiellement, comme LangFuse qui est d'ailleurs Open Source et peut être auto-hébergé.
 
 ## 4 Architecture de données et stockage
-# TODO
-Détails sur schemas de données
+### Schéma de données
 
+***Résultats d'analyse***
+Pour les résultats de différentes analyses, on pourrait utiliser des tables relationnelles avec colonnes JSONB. Différents champs et métadonnées potentiels avec variations selon type d'analyse:
+- id (uuid, PK)
+- request_id (FK)
+- tools_used (list[str])
+- payload (dict)
+- insights (dict)
+- timestamp (datetime)
+...
 
+ ***Historique des requêtes***
+En plus de langfuse, on aurait les checkpoints LangGraph, qui gardent l'état de l'agent à chaque étape, et peut être sauvegardé en mémoire ou directement dans une bd Postgres. Similaire aux résultats d'analyse:
+- thread_id (string)
+- checkpoint (JSONB)
+- query (string)
+autres
 
-### Stockage résultats d'analyse:
+***Cache des données collectées***
+Peu de champs, bd clé:valeur
+- key (str)
+- content (str)
+- expires_at 
+
+***Configuration des agents***
+Configurations pourraient être sauvegardées comme du code python. Avec LangGraph par exemple, on peut avoir un objet agent (`create_agent`) comme ceci:
+
+```
+agent = create_agent(
+    model= "choix_de_model",
+    tools = [liste_doutils],
+    system_prompt=prompt_systeme,
+    autres_params..
+)
+```
+On peut ajouter des paramètres au besoin, créer de nouveaux agents avec une liste d'outils différents ou un autre modèle etc.
+
+Le versionage des fichiers permet donc aussi de garder un historique des différentes versions des agents.
+
+### Systèmes de stockage
+
+***Stockage résultats d'analyse***
 PostgreSQL semble un bon choix. Assez standard, peut être auto-hébergé (docker) ou via différentes solutions cloud gérées selon équipe, expertise, budget etc.
 Désultats stockés en JSONB pour flexibilité.
 
-### Maintien de l'historique des requêtes:
+***Maintien de l'historique des requêtes***
 (Plus de détail dans #5)
 LangFuse (auto-hébergé ou SaaS) stocke par défaut tous les détails des requêtes dans une bd ClickHouse, qui est incluse dans le docker-compose. La bd est haute performance, permet de stocker et requêter efficacement de très grands volumes de données. Les métadonnées des requêtes sont stockées dans une bd PostgreSQL, aussi incluse dans le docker-compose.
 
-### Cachage des données collectées:
-Pour les données collectées et mises en cache, Valkey est un bon choix. BD très haute performance, flexible, license très permissive, plusieurs améliorations par rapport à Redis. Disponible en auto-hébergé ou via différents fournisseurs.
+***Cachage des données collectées***
+Pour les données collectées et mises en cache, Valkey est un bon choix. BD très haute performance, flexible, license très permissive, certaines améliorations par rapport à Redis mais peut-être moins d'intégrations/outils. Disponible en auto-hébergé ou via différents fournisseurs.
+
+Comme Redis serait probablement utilisé ailleurs pour ses intégrations etc., peut-être qu'utiliser Redis ici aussi aurait plus de sens. Similaire à Valkey, très rapide, flexible etc.
 
 
-### Configuration des agents:
+***Configuration des agents***
 Solution de base: Config-as-code dans dépôt. Prompts et configs ont versioning, revues etc. Agnostique, très simple et flexible. Manque de fonctionnalités avancées pour évaluation etc.
 En plus ou à la place de ça, LangFuse a plusieurs options pour gérer les prompts: versioning, expérimentation, traçabilité etc., directement lié à config des agents.
 
