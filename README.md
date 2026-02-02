@@ -64,6 +64,9 @@ curl -X POST http://localhost:8000/analyze \
 ```
 
 
+5. Suite de tests:
+`uv run pytest`
+
 # Théorie, améliorations possibles etc.
 **Note**: Pour limiter le nombre de technologies ou services différents, je vais préférer des solutions qui offrent plusieurs outils ou ont plusieurs intégrations supportées officiellement, comme LangFuse qui est d'ailleurs Open Source et peut être auto-hébergé.
 
