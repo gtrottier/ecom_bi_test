@@ -2,20 +2,20 @@ import os
 from typing import Literal
 
 from dotenv import load_dotenv
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.messages import AIMessage, SystemMessage
 from langchain_openai import ChatOpenAI
-from langgraph.graph import END, START, StateGraph
+from langgraph.graph import START, StateGraph
 from langgraph.prebuilt import ToolNode
 
+from app.prompts import SYSTEM_PROMPT_FR
 from app.schema import AgentState
 from app.tools.reporter import generate_report
 from app.tools.scraper import scrape_product_data
 from app.tools.sentiment import analyze_sentiment
-from app.tools.trends import analyze_trends
 
 load_dotenv()
 
-tools = [scrape_product_data, analyze_sentiment, analyze_trends, generate_report]
+tools = [scrape_product_data, analyze_sentiment, generate_report]
 tool_node = ToolNode(tools)
 
 llm = ChatOpenAI(
@@ -31,6 +31,10 @@ llm_with_tools = llm.bind_tools(tools)
 def call_model(state: AgentState):
     """Invoke le llm avec 'state' actuel"""
     messages = state["messages"]
+    # Ajout du system prompt si nécessaire
+    if not isinstance(messages[0], SystemMessage):
+        messages = [SystemMessage(content=SYSTEM_PROMPT_FR)] + messages
+
     response = llm_with_tools.invoke(messages)
     return {"messages": [response]}
 

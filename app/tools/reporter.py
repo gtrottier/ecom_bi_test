@@ -1,5 +1,4 @@
 import os
-import random
 from typing import Any
 
 import matplotlib.pyplot as plt
@@ -10,43 +9,23 @@ from app.schema import ToolResult
 
 def _generate_distribution_chart(score: float) -> str:
     """
-    Génère un graphique de distribution des notes avec matplotlib.
-
-    Contenu entièrement arbitraire, pourrait prendre de vrai données, agréger les notes, etc.
+    Génère un graphique de sentiment avec matplotlib.
     """
     try:
-        distribution = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
-        total_votes = 100
-        for _ in range(total_votes):
-            vote = int(random.gauss(score, 0.8))
-            vote = max(1, min(5, vote))
-            distribution[vote] += 1
+        plt.figure(figsize=(6, 2))
+        plt.barh(
+            ["Sentiment"], [score], color="green" if score > 0 else "red", height=0.5
+        )
+        plt.xlim(-1, 1)
+        plt.axvline(0, color="black", linewidth=1)
+        plt.title(f"Polarité du Sentiment (Score: {score:+.2f})")
+        plt.xlabel("Négatif <---> Positif")
+        plt.grid(axis="x", linestyle="--", alpha=0.7)
 
-        ratings = list(distribution.keys())
-        counts = list(distribution.values())
-
-        plt.figure(figsize=(6, 4))
-        bars = plt.bar(ratings, counts, color="skyblue", edgecolor="black")
-        plt.title(f"Distribution des Notes (Score: {score}/5)")
-        plt.xlabel("Étoiles")
-        plt.ylabel("Nombre de votes")
-        plt.xticks(ratings)
-        plt.grid(axis="y", linestyle="--", alpha=0.7)
-
-        for bar in bars:
-            height = bar.get_height()
-            plt.text(
-                bar.get_x() + bar.get_width() / 2.0,
-                height,
-                f"{int(height)}%",
-                ha="center",
-                va="bottom",
-            )
         filename = "sentiment_distribution.png"
         plt.tight_layout()
         plt.savefig(filename)
         plt.close()
-        print(f"File saved to {os.path.abspath(filename)}")
         return filename
     except Exception:
         plt.close()
@@ -72,11 +51,10 @@ def generate_report(
         report_lines.append(f"# Rapport d'Analyse: {product_name}")
         report_lines.append("")
 
-        # Section Données Produit (Scraper)
+        # Section données produit (Scraper)
         if product_data:
             report_lines.append("## Aperçu du Marché")
             if isinstance(product_data, list):
-                # Table header
                 report_lines.append("| Plateforme | Prix | Disponibilité | Lien |")
                 report_lines.append("|---|---|---|---|")
                 for item in product_data:
@@ -91,24 +69,27 @@ def generate_report(
                 report_lines.append("_Format de données produit non reconnu._")
             report_lines.append("")
 
-        # Section Analyse de Sentiment (Sentiment Analyzer)
+        # Section analyse de sentiment (Sentiment Analyzer)
         if sentiment_data:
-            report_lines.append("## Analyse de Sentiment")
+            report_lines.append("## Analyse de sentiment")
 
             score = sentiment_data.get("sentiment_score", 0)
             overall = sentiment_data.get("overall_sentiment", "N/A")
 
             report_lines.append(f"- **Sentiment Global**: {overall}")
-            report_lines.append(f"- **Score**: {score}/5")
+            report_lines.append(f"- **Score**: {score}")
 
-            # Visualisation étoiles "dingbats"
-            filled = int(max(0, min(5, score)))
-            empty = 5 - filled
-            bar = "★" * filled + "☆" * empty
-            report_lines.append(f"- **Indicateur**: `{bar}` ({score})")
+            # Visualisation jauge polarité
+            width = 20
+            pos = int((score + 1) / 2 * width)
+            pos = max(0, min(width, pos))
+            gauge_chars = list("-" * (width + 1))
+            gauge_chars[width // 2] = "|"
+            gauge_chars[pos] = "█"
+            gauge = "".join(gauge_chars)
+            report_lines.append(f"- **Indicateur**: `Neg [{gauge}] Pos` ({score:+.2f})")
             report_lines.append("")
 
-            # Visualisation Matplotlib (Image)
             chart_file = _generate_distribution_chart(score)
             if chart_file:
                 abs_path = os.path.abspath(chart_file)

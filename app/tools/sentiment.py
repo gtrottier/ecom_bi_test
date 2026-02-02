@@ -13,7 +13,7 @@ def analyze_sentiment(
     Cet outil pourrait faire appel à des plateformes externes pour récupérer les avis clients
     """
     try:
-        sentiment_score = random.randint(0, 5)  # étoiles
+        sentiment_score = random.uniform(-1, 1)
 
         themes = [
             "battery life",
