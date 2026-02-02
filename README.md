@@ -40,6 +40,12 @@ La clé API n'est pas fournie car le dépôt est public. Il suffit d'ajouter la 
     
     ***Note*** : Vous pouvez lancer des requêtes de test directement depuis l'interface swagger en appuyant sur "Try it out", ou avec curl/postman etc.
 
+5. Suite de tests:
+`uv run pytest`
+
+
+
+
 ***Exemples de contenu de requêtes:***
 
 ```
@@ -64,8 +70,6 @@ curl -X POST http://localhost:8000/analyze \
 ```
 
 
-5. Suite de tests:
-`uv run pytest`
 
 # Théorie, améliorations possibles etc.
 **Note**: Pour limiter le nombre de technologies ou services différents, je vais préférer des solutions qui offrent plusieurs outils ou ont plusieurs intégrations supportées officiellement, comme LangFuse qui est d'ailleurs Open Source et peut être auto-hébergé.
