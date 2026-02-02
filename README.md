@@ -4,8 +4,8 @@
 
 Simple système agentique d'analyse de données e-commerce. Utilise plusieurs outils (mock) pour scraper des données, analyser les tendances et les sentiments, et générer des rapports.
 
-Pour minimiser les dépendances, Docker est utilisé.
-Pour un setup de développement, uv/poetry. 
+Pour simplifier le déploiement et l'essai, Docker est utilisé.
+Pour le développement, on préferera uv/poetry. 
 ## Installation
 
 ### Prérequis
@@ -14,11 +14,11 @@ Pour un setup de développement, uv/poetry.
 - Docker
 - uv package manager (préférablement, sinon pip ou poetry peuvent fonctionner)
 - python >= 3.12
-
 - Clé API OpenRouter. 
-    **Note**: Clé API non-fournie car repo publique. Seulement ajouter la variable d'env OPENROUTER_API_KEY.
 
-**Note**: Non-requis mais on suppose un shell POSIX (bash, zsh, etc) et les permissions nécessaires. Commandes roulées à partir de la racine du dépôt.
+La clé API n'est pas fournie car le dépôt est public. Il suffit d'ajouter la variable d'env OPENROUTER_API_KEY avec une clé valide.
+
+***note***: Non-requis mais on suppose un shell POSIX (bash, zsh, etc) et les permissions nécessaires. Commandes roulées à partir de la racine du dépôt.
 
 ### Installation et utilisation
 
@@ -31,15 +31,17 @@ Pour un setup de développement, uv/poetry.
 
 3. Lancer l'API:
     - Option 1: Docker
-        - `docker-compose up -d`
+        - `docker compose up -d`
     - Option 2: Local
         - `uv run uvicorn app.main:app --reload --port 8000`
 
 4. Voir api docs:
-    - `http://localhost:8000/docs`
-    # note : Vous pouvez lancer des requêtes de test directement depuis l'interface swagger, ou avec curl/postman etc.
+    - `http://localhost:8000/docs`  
+    
+    ***Note*** : Vous pouvez lancer des requêtes de test directement depuis l'interface swagger en appuyant sur "Try it out", ou avec curl/postman etc.
 
 ***Exemples de contenu de requêtes:***
+
 ```
 curl -X POST http://localhost:8000/analyze \
      -H "Content-Type: application/json" \
